@@ -14,7 +14,6 @@ import shutil
 import difflib
 
 from jinja2 import Environment, FileSystemLoader
-from weasyprint import HTML, CSS
 import matplotlib.pyplot as plt
 
 TEMPLATE = '''<html>
@@ -148,7 +147,7 @@ TEMPLATE = '''<html>
                 </div>
                 <br>
             {% endif %}
-            <span id=footer>Report generated with <a href="https://github.com/Orange-Cyberdefense/graphcat">https://github.com/Orange-Cyberdefense/graphcat</a>, a tool by Orange Cyberdefense.</span>         
+            <span id=footer>Report generated with <a href="https://github.com/wodensec/graphcat-ng">https://github.com/wodensec/graphcat-ng</a>, a tool originally by <a href="https://github.com/Orange-Cyberdefense/graphcat">Orange Cyberdefense</a>.</span>
     </body>
 </html>
 '''
@@ -241,7 +240,11 @@ class GraphCat:
     def gen_stat(self) -> Dict:
         print('[-] Generating graphs...')
 
-        dirpath = tempfile.mkdtemp()
+        dirpath = os.path.join(self.outputdir, f"results_{self.timestamp}")
+        if not os.path.exists(dirpath):
+            os.makedirs(dirpath, exist_ok=True)
+        
+        print(f"Results directory: {dirpath}")
         
         # Pie N°1 : Cracked stats
 
@@ -471,54 +474,17 @@ class GraphCat:
                             most = most,
                             baseword = basewords,
                             masks = common_masks,
-                            img_found = os.path.join(dirpath,'cracked.png'),
-                            img_format = os.path.join(dirpath,'format.png'),
-                            img_length = os.path.join(dirpath,'length.png'),
-                            img_most = os.path.join(dirpath,'most.png'),
-                            img_baseword = os.path.join(dirpath,'basewords.png'),
-                            img_masks =  os.path.join(dirpath,'masks.png'),
-                            img_history = os.path.join(dirpath,'history.png') if history_reuse > 0 else '',
+                            img_found = 'cracked.png',
+                            img_format = 'format.png',
+                            img_length = 'length.png',
+                            img_most = 'most.png',
+                            img_baseword = 'basewords.png',
+                            img_masks =  'masks.png',
+                            img_history = 'history.png' if history_reuse > 0 else '',
                             )
 
         with open(os.path.join(dirpath,'report.html'), 'w') as f:
             f.write(html)  
-
-        css = CSS(string='''
-            @page {size: A4; margin: 1cm; @bottom-right {
-                font-size: 10px;
-                content: counter(page) " / " counter(pages);
-                margin: 10px 10px 25px 10px;
-            }} 
-            th, td {border: 1px solid black;}
-            img {width: 100%}
-            .crop-container {overflow: hidden;}
-            .crop-container img {margin-left: -50px;}
-            h1 {text-align: center;font-size:30px;}
-            h3 {font-size:24px;}
-            table {width: 85%; border-collapse: collapse; margin-right: auto;}
-            table,th,td {border: 1px solid black;}
-            thead {background-color: #3563EC;color: #ffffff; font-size: 18px;}
-            th {text-align: center;height: 50px;}
-            td {font-size: 16px; text-align: left;padding: 5px; vertical-align: center;}
-            @media print {h3 {page-break-before: always;}}
-            @font-face {
-            font-family: 'Titillium Web';
-            font-style: normal;
-            font-weight: 300;
-            src: local('Titillium Web Light'), local('TitilliumWeb-Light');
-            }
-            *, div {font-family: 'Titillium Web';}
-            #footer {font-size:8px;}
-            ''')
-
-        filename = "graphcat_%s.pdf" % self.timestamp
-
-        HTML(os.path.join(dirpath,'report.html')).write_pdf(os.path.join(self.outputdir,filename), stylesheets=[css], optimize_size=('fonts', 'images'))
-        
-        # Cleanup
-
-        shutil.rmtree(dirpath)
-        print('[-] Report available at %s' % filename)
 
     def isNaN(self,num):
         return num!= num
