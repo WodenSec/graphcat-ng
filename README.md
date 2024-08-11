@@ -14,9 +14,17 @@ Simple script to generate graphs and charts on hashcat (and john) potfile and nt
 
 ## Install
 
+### Prerequisite
 ```text
-git clone https://github.com/Orange-Cyberdefense/graphcat
-cd graphcat
+apt install python3-venv
+```
+
+### Installation
+```text
+git clone https://github.com/WodenSec/graphcat-ng
+cd graphcat-ng
+python3 -m venv .venv
+source .venv/bin/activate
 pip install .
 ```
 
@@ -44,19 +52,19 @@ options:
 
 ## Usage
 
-Graphcat just need a potfile with `-potfile` (default is hashcat, but you can use `-john` to submit a john potfile) and a hashfile with `-hashfile`. The hashfile should be in a specific format from the [3 availables formats](#formats) with `-format` flag. Default is **Secretsdump**.
+Graphcat just needs a potfile with `-potfile` (default is hashcat, but you can use `-john` to submit a john potfile) and a hashfile with `-hashfile`. The hashfile should be in a specific format from the [3 availables formats](#formats) with `-format` flag. Default is **Secretsdump**.
 
 The tool will generate a report with multiple password cracking charts. You can get charts in png with the `-export-charts` flag.
 
 ```text
 $ graphcat.py -hashfile entreprise.local.ntds -potfile hashcat.pot
 [-] Parsing potfile
-[-] 164 entries in potfile
+[-] 95 entries in potfile
 [-] Parsing hashfile
-[-] 1600 entries in hashfile
+[-] 923 entries in hashfile
 [-] Generating graphs...
+Results directory: ./results_1723406377
 [-] Generating report...
-[-] Report available at graphcat_1672941324.pdf
 ```
 
 ### Formats
