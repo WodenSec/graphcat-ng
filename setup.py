@@ -11,7 +11,8 @@ setup(
     license="MIT",
     install_requires=[
         "matplotlib==3.6.2",
-        "Jinja2==3.1.2"
+        "Jinja2==3.1.2",
+        "numpy<2"
     ],
     python_requires='>=3.6',
     scripts=["graphcat.py"]
