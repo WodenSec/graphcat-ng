@@ -1,6 +1,6 @@
 # graphcat.py
 
-Simple script to generate graphs and charts on hashcat (and john) potfile and ntds.
+Simple script to generate graphs and charts on hashcat potfile and ntds.
 
 ## Table of Content
 
@@ -32,32 +32,32 @@ pip install .
 
 ```text
 $ graphcat.py -h
-usage: graphcat.py [-h] -potfile hashcat.potfile -hashfile hashfile.txt [-john] [-format FORMAT] [-export-charts] [-output-dir OUTPUT_DIR] [-debug]
+usage: graphcat.py [-h] -p hashcat.potfile -H hashfile.txt [-f FORMAT] [-e] [-o OUTPUT_DIR] [-d]
 
 Password Cracking Graph Reporting
 
 options:
   -h, --help            show this help message and exit
-  -potfile hashcat.potfile
-                        Hashcat Potfile
-  -hashfile hashfile.txt
+  -p hashcat.potfile, --potfile hashcat.potfile
+                        Hashcat potfile
+  -H hashfile.txt, --hashfile hashfile.txt
                         File containing hashes (one per line)
-  -john                 John potfile
-  -format FORMAT        hashfile format (default 3): 1 for hash; 2 for username:hash; 3 for secretsdump (username:uid:lm:ntlm)
-  -export-charts        Output also charts in png
-  -output-dir OUTPUT_DIR
+  -f FORMAT, --format FORMAT
+                        hashfile format (default 3): 1 for hash; 2 for username:hash; 3 for secretsdump (username:uid:lm:ntlm)
+  -e, --export-charts   Output also charts in png
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
-  -debug                Turn DEBUG output ON
+  -d, --debug           Turn DEBUG output ON
 ```
 
 ## Usage
 
-Graphcat just needs a potfile with `-potfile` (default is hashcat, but you can use `-john` to submit a john potfile) and a hashfile with `-hashfile`. The hashfile should be in a specific format from the [3 availables formats](#formats) with `-format` flag. Default is **Secretsdump**.
+Graphcat just needs a potfile with `-p/--potfile` (hashcat potfile) and a hashfile with `-H/--hashfile`. The hashfile should be in a specific format from the [3 availables formats](#formats) with `-f/--format` flag. Default is **Secretsdump**.
 
 The tool will generate a report with multiple password cracking charts. You can get charts in png with the `-export-charts` flag.
 
 ```text
-$ graphcat.py -hashfile entreprise.local.ntds -potfile hashcat.pot
+$ graphcat.py -H entreprise.local.ntds -p hashcat.pot
 [-] Parsing potfile
 [-] 95 entries in potfile
 [-] Parsing hashfile
