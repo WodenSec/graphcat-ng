@@ -190,24 +190,19 @@ class GraphCat:
         self.potfile = None
         self.hashes = None
         self.outputdir = '.'
-        if options.output_dir is not None:
-            self.outputdir = options.output_dir
+        if self.options.output_dir is not None:
+            self.outputdir = self.options.output_dir
             if not os.path.isdir(self.outputdir):
                 os.makedirs(self.outputdir, exist_ok=True)
 
         print('[-] Parsing potfile')
-        if options.potfile is not None:
+        if self.options.potfile is not None:
             arr = dict()
-            with open(options.potfile, 'r') as lines:
+            with open(self.options.potfile, 'r') as lines:
                 for line in lines:
                     l = line.rstrip('\n')
                     if ':' in l:
                         l = l.split(':',1)
-                        if options.john:
-                            if '$NT$' in l[0]:
-                                l[0] = l[0].replace('$NT$','')
-                            else:
-                                continue
                         arr[l[0].lower()]=l[1]
                 self.potfile = arr
         if len(self.potfile) == 0:
@@ -216,13 +211,13 @@ class GraphCat:
         print('[-] %s entries in potfile' % len(self.potfile))
 
         print('[-] Parsing hashfile')
-        if options.hashfile is not None:
-            
-            with open(options.hashfile, 'r') as lines:
-                if options.format in ['1','2']:
+        if self.options.hashfile is not None:
+
+            with open(self.options.hashfile, 'r') as lines:
+                if self.options.format in ['1','2']:
                     self.hashes = [line.rstrip('\n') for line in lines ]
-                elif options.format == '3':
-                    self.hashes = [line.rstrip('\n').split(':::')[0] for line in lines 
+                elif self.options.format == '3':
+                    self.hashes = [line.rstrip('\n').split(':::')[0] for line in lines
                     if '$:' not in line and '$_history' not in line and ':::' in line]
                 else:
                     print('[!] Unknown format')
@@ -263,7 +258,11 @@ class GraphCat:
 
         plt.clf()
         plt.figure(figsize=[15, 7])
-        text_prop = {'fontsize':'x-large', 'fontweight':'heavy', 'color':'black', 'fontsize': 20}
+        text_prop = {
+            'fontsize': 20,
+            'fontweight': 'heavy',
+            'color': 'black',
+        }
 
         plt.pie(found.values(),
                 wedgeprops={'edgecolor':'White','linewidth': 5,'antialiased': True},
@@ -309,7 +308,11 @@ class GraphCat:
         
         plt.clf()
         plt.figure(figsize=[15, 7])
-        text_prop = {'fontsize':'x-large', 'fontweight':'heavy', 'color':'black', 'fontsize': 20}
+        text_prop = {
+            'fontsize': 20,
+            'fontweight': 'heavy',
+            'color': 'black',
+        }
         
         plt.pie(tmp_format.values(),
                 wedgeprops={'edgecolor':'White','linewidth': 5,'antialiased': True},
@@ -431,7 +434,11 @@ class GraphCat:
         if history_reuse > 0:
             plt.clf()
             plt.figure(figsize=[15, 7])
-            text_prop = {'fontsize':'x-large', 'fontweight':'heavy', 'color':'black', 'fontsize': 20}
+            text_prop = {
+                'fontsize': 20,
+                'fontweight': 'heavy',
+                'color': 'black',
+            }
             plt.pie([history_reuse, len(self.cracked_users.values()) - history_reuse], 
                     wedgeprops={'edgecolor':'White','linewidth': 5,'antialiased': True},
                     textprops=text_prop,
@@ -538,7 +545,7 @@ class GraphCat:
         users = dict()
         userhist_lines = list()
 
-        if options.format == '1':
+        if self.options.format == '1':
             i = 0
             for hash in self.hashes:
                 cleartext = None
@@ -547,7 +554,7 @@ class GraphCat:
                     cleartext = self.potfile[hash]
                 users[f'user_{i}']=User(f'user_{i}', hash, cleartext)
                 i += 1
-        elif options.format == '2':
+        elif self.options.format == '2':
             for line in self.hashes:
                 username, hash = line.split(':')
                 hash = hash.lower()
@@ -555,7 +562,7 @@ class GraphCat:
                 if hash in self.potfile.keys():
                     cleartext = self.potfile[hash]
                 users[username]=User(username, hash, cleartext)
-        elif options.format == '3':
+        elif self.options.format == '3':
             for line in self.hashes:
                 if '_history' in line:
                     userhist_lines.append(line)
@@ -599,26 +606,33 @@ if __name__ == '__main__':
     )
 
     parser.add_argument(
-        "-potfile",
+        "-p", "--potfile",
         action="store",
         required=True,
         metavar="hashcat.potfile",
-        help="Hashcat Potfile",
+        help="Hashcat potfile",
     )
 
     parser.add_argument(
-        "-hashfile",
+        "-H", "--hashfile",
         action="store",
         required=True,
         metavar="hashfile.txt",
         help="File containing hashes (one per line)",
     )
 
-    parser.add_argument("-john", action="store_true", help="John potfile")
-    parser.add_argument("-format", action="store", default="3", help="hashfile format (default 3): 1 for hash; 2 for username:hash; 3 for secretsdump (username:uid:lm:ntlm)")
-    parser.add_argument("-export-charts", action="store_true", help="Output also charts in png")
-    parser.add_argument("-output-dir", action="store", help="Output directory")
-    parser.add_argument("-debug", action="store_true", help="Turn DEBUG output ON")
+    parser.add_argument(
+        "-f", "--format",
+        action="store",
+        default="3",
+        help=(
+            "hashfile format (default 3): 1 for hash; 2 for username:hash; "
+            "3 for secretsdump (username:uid:lm:ntlm)"
+        ),
+    )
+    parser.add_argument("-e", "--export-charts", action="store_true", help="Output also charts in png")
+    parser.add_argument("-o", "--output-dir", action="store", help="Output directory")
+    parser.add_argument("-d", "--debug", action="store_true", help="Turn DEBUG output ON")
 
     options = parser.parse_args()
 
