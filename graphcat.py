@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import argparse
 from collections import Counter
@@ -16,26 +16,95 @@ import difflib
 from jinja2 import Environment, FileSystemLoader
 import matplotlib.pyplot as plt
 
-TEMPLATE = '''<html>
+TRANSLATIONS = {
+    'en': {
+        'lang_code': 'en',
+        'page_title': 'Password Cracking Report',
+        'title': 'Password Cracking Report',
+        'total_hashes': 'Total hashes submitted:',
+        'passwords_found': 'Passwords found:',
+        'passwords_not_found': 'Passwords not found:',
+        'percent_recovered': 'Percent of recovered passwords:',
+        'section_format': 'Password Format repartition',
+        'section_length': 'Password Length repartition',
+        'section_most': 'Top 10 Most used passwords',
+        'section_baseword': 'Top 10 Most used basewords',
+        'section_mask': 'Top 10 Most used masks',
+        'legend': 'Legend: d = digit, l = lowercase, U = uppercase, $ = special',
+        'section_history': 'Users with similar password pattern along history',
+        'footer_prefix': 'Report generated with',
+        'format_header': 'Format',
+        'count_header': 'Count',
+        'length_header': 'Length',
+        'password_header': 'Password',
+        'mask_header': 'Masks',
+        'percent_header': 'Percent',
+        'xlabel_length': 'Length',
+        'ylabel_count': 'Count',
+        'history_with': 'Users with similar password \npattern along history',
+        'history_without': 'Users without similar password \npattern along history',
+    },
+    'fr': {
+        'lang_code': 'fr',
+        'page_title': 'Rapport de craquage de mots de passe',
+        'title': 'Rapport de craquage de mots de passe',
+        'total_hashes': 'Nombre total de hachages soumis :',
+        'passwords_found': 'Mots de passe trouvés :',
+        'passwords_not_found': 'Mots de passe non trouvés :',
+        'percent_recovered': 'Pourcentage de mots de passe récupérés :',
+        'section_format': 'Répartition du format des mots de passe',
+        'section_length': 'Répartition de la longueur des mots de passe',
+        'section_most': 'Top 10 des mots de passe les plus utilisés',
+        'section_baseword': 'Top 10 des mots racines les plus utilisés',
+        'section_mask': 'Top 10 des masques les plus utilisés',
+        'legend': 'Légende : d = chiffre, l = minuscule, U = majuscule, $ = spécial',
+        'section_history': 'Utilisateurs avec un mot de passe similaire dans l’historique',
+        'footer_prefix': 'Rapport généré avec',
+        'format_header': 'Format',
+        'count_header': 'Nombre',
+        'length_header': 'Longueur',
+        'password_header': 'Mot de passe',
+        'mask_header': 'Masques',
+        'percent_header': 'Pourcentage',
+        'xlabel_length': 'Longueur',
+        'ylabel_count': 'Nombre',
+        'history_with': 'Utilisateurs ayant un mot de passe \nsimilaire dans l’historique',
+        'history_without': 'Utilisateurs sans mot de passe \nsimilaire dans l’historique',
+    },
+}
+
+TEMPLATE = '''<!DOCTYPE html>
+<html lang="{{lang_code}}">
     <head>
+        <meta charset="UTF-8">
         <title>{{page_title_text}}</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; background-color: #f7f7f7; color: #333; }
+            table { border-collapse: collapse; margin-bottom: 20px; width: 100%; background-color: #fff; }
+            th, td { border: 1px solid #ccc; padding: 8px 12px; }
+            th { background-color: #e9e9e9; }
+            tr:nth-child(even) { background-color: #f2f2f2; }
+            h1 { text-align: center; }
+            img { max-width: 100%; height: auto; }
+            .chart { width: 800px; display: block; margin: 0 auto; }
+        </style>
     </head>
     <body>
-            <h1 style="align: center;">{{title_text}}</h1>
+            <h1>{{title_text}}</h1>
             <br>
-            <p>Total hashes submitted: <b>{{total_user}}</b></p>
-            <p>Passwords found: <b>{{cracked}}</b></p>
-            <p>Passwords not found: <b>{{not_cracked}}</b></p>
-            <p>Percent of recovered passwords: <b>{{cracked_pct}}%</b></p>
+            <p>{{total_hashes}} <b>{{total_user}}</b></p>
+            <p>{{passwords_found}} <b>{{cracked}}</b></p>
+            <p>{{passwords_not_found}} <b>{{not_cracked}}</b></p>
+            <p>{{percent_recovered}} <b>{{cracked_pct}}%</b></p>
             <br>
-            <img src='{{img_found}}' style="width: 800px">
+            <img src='{{img_found}}' class="chart">
             <br>
-            <h3 id="format">Password Format repartition</h3>
+            <h3 id="format">{{section_format}}</h3>
             <table>
                 <thead>
                     <tr>
-                        <th scope="col">Format</th>
-                        <th scope="col">Count</th>
+                        <th scope="col">{{format_header}}</th>
+                        <th scope="col">{{count_header}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -48,14 +117,14 @@ TEMPLATE = '''<html>
                 </tbody>
             </table>
             <br>
-            <img src='{{img_format}}' style="width: 800px">
+            <img src='{{img_format}}' class="chart">
             <br>
-            <h3 id="length">Password Length repartition</h3>
+            <h3 id="length">{{section_length}}</h3>
             <table>
                 <thead>
                     <tr>
-                        <th scope="col">Length</th>
-                        <th scope="col">Count</th>
+                        <th scope="col">{{length_header}}</th>
+                        <th scope="col">{{count_header}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,15 +138,15 @@ TEMPLATE = '''<html>
             </table>
             <br>
             <div class="crop-container">
-                <img src='{{img_length}}' style="width: 800px">
+                <img src='{{img_length}}' class="chart">
             </div>
             <br>
-            <h3 id="most">Top 10 Most used passwords</h3>
+            <h3 id="most">{{section_most}}</h3>
             <table>
                 <thead>
                     <tr>
-                        <th scope="col">Password</th>
-                        <th scope="col">Count</th>
+                        <th scope="col">{{password_header}}</th>
+                        <th scope="col">{{count_header}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,16 +160,16 @@ TEMPLATE = '''<html>
             </table>
             <br>
             <div class="crop-container">
-                <img src='{{img_most}}' style="width: 800px">
+                <img src='{{img_most}}' class="chart">
             </div>
             <br>
             <br>
-            <h3 id="baseword">Top 10 Most used basewords</h3>
+            <h3 id="baseword">{{section_baseword}}</h3>
             <table>
                 <thead>
                     <tr>
-                        <th scope="col">Password</th>
-                        <th scope="col">Count</th>
+                        <th scope="col">{{password_header}}</th>
+                        <th scope="col">{{count_header}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -114,16 +183,16 @@ TEMPLATE = '''<html>
             </table>
             <br>
             <div class="crop-container">
-                <img src='{{img_baseword}}' style="width: 800px">
+                <img src='{{img_baseword}}' class="chart">
             </div>
             <br>
-            <h3 id="mask">Top 10 Most used masks</h3>
+            <h3 id="mask">{{section_mask}}</h3>
             <table>
                 <thead>
                     <tr>
-                        <th scope="col">Masks</th>
-                        <th scope="col">Count</th>
-                        <th scope="col">Percent</th>
+                        <th scope="col">{{mask_header}}</th>
+                        <th scope="col">{{count_header}}</th>
+                        <th scope="col">{{percent_header}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -137,17 +206,17 @@ TEMPLATE = '''<html>
                 </tbody>
             </table>
             <br>
-            <p>Legend: d = digit, l = lowercase, U = uppercase, $ = special</p>
+            <p>{{legend}}</p>
             <br>
             {% if img_history != '' %}
-                <h3 id="history">Users with similar password pattern along history</h3>
+                <h3 id="history">{{section_history}}</h3>
                 <br>
                 <div class="crop-container">
-                <img src='{{img_history}}' style="width: 800px">
+                <img src='{{img_history}}' class="chart">
                 </div>
                 <br>
             {% endif %}
-            <span id=footer>Report generated with <a href="https://github.com/wodensec/graphcat-ng">https://github.com/wodensec/graphcat-ng</a>, a tool originally by <a href="https://github.com/Orange-Cyberdefense/graphcat">Orange Cyberdefense</a>.</span>
+            <span id=footer>{{footer_prefix}} <a href="https://github.com/wodensec/graphcat-ng">https://github.com/wodensec/graphcat-ng</a>, a tool originally by <a href="https://github.com/Orange-Cyberdefense/graphcat">Orange Cyberdefense</a>.</span>
     </body>
 </html>
 '''
@@ -185,6 +254,7 @@ class User:
 class GraphCat:
     def __init__(self, options):
         self.options = options
+        self.trans = TRANSLATIONS['fr'] if self.options.french else TRANSLATIONS['en']
 
         self.timestamp = calendar.timegm(time.gmtime())
         self.potfile = None
@@ -354,8 +424,8 @@ class GraphCat:
         y = list(longueur.values())
         plt.figure(figsize=[15, 7])
         plt.bar(x,y,  color='#3563EC', edgecolor='white')
-        plt.xlabel('Length', fontsize=20)
-        plt.ylabel("Count", fontsize=20)
+        plt.xlabel(self.trans['xlabel_length'], fontsize=20)
+        plt.ylabel(self.trans['ylabel_count'], fontsize=20)
         plt.rc('axes', titlesize=20)
         plt.rc('font', size=15)
         plt.xticks(fontsize=15)
@@ -393,7 +463,7 @@ class GraphCat:
         y = list(most.values())
         plt.figure(figsize=[15, 10])
         plt.bar(x,y, color='#3563EC', edgecolor='white')
-        plt.ylabel("Count", fontsize=20)
+        plt.ylabel(self.trans['ylabel_count'], fontsize=20)
         plt.xticks(rotation=23)
         for i in range(len(x)):
             plt.text(i, y[i]+(most_max/100*1.5), y[i], ha = 'center')
@@ -414,7 +484,7 @@ class GraphCat:
         y = list(basewords.values())
         plt.figure(figsize=[15, 10])
         plt.bar(x,y, color='#3563EC', edgecolor='white')
-        plt.ylabel("Count",  fontsize=20)
+        plt.ylabel(self.trans['ylabel_count'],  fontsize=20)
         plt.xticks(rotation=23)
          
         for i in range(len(x)):
@@ -448,7 +518,7 @@ class GraphCat:
                     pctdistance=1.3,
                     )
 
-            plt.legend(labels=['Users with similar password \npattern along history', 'Users without similar password \npattern along history'], loc='best', 
+            plt.legend(labels=[self.trans['history_with'], self.trans['history_without']], loc='best',
             bbox_to_anchor=(0.1,0.2), ncol=1, fontsize=16)
 
             centre_circle = plt.Circle((0, 0), 0.60, fc='white')
@@ -470,8 +540,27 @@ class GraphCat:
 
         template = env.get_template('template.html')
 
-        html = template.render(page_title_text='Password Cracking Report',
-                            title_text='Password Cracking Report',
+        html = template.render(page_title_text=self.trans['page_title'],
+                            title_text=self.trans['title'],
+                            lang_code=self.trans['lang_code'],
+                            total_hashes=self.trans['total_hashes'],
+                            passwords_found=self.trans['passwords_found'],
+                            passwords_not_found=self.trans['passwords_not_found'],
+                            percent_recovered=self.trans['percent_recovered'],
+                            section_format=self.trans['section_format'],
+                            format_header=self.trans['format_header'],
+                            count_header=self.trans['count_header'],
+                            section_length=self.trans['section_length'],
+                            length_header=self.trans['length_header'],
+                            section_most=self.trans['section_most'],
+                            password_header=self.trans['password_header'],
+                            section_baseword=self.trans['section_baseword'],
+                            section_mask=self.trans['section_mask'],
+                            mask_header=self.trans['mask_header'],
+                            percent_header=self.trans['percent_header'],
+                            legend=self.trans['legend'],
+                            section_history=self.trans['section_history'],
+                            footer_prefix=self.trans['footer_prefix'],
                             total_user = total_user,
                             cracked = found['Recovered'],
                             not_cracked = found['Not recovered'],
@@ -630,6 +719,7 @@ if __name__ == '__main__':
             "3 for secretsdump (username:uid:lm:ntlm)"
         ),
     )
+    parser.add_argument("--french", action="store_true", help="Generate report in French")
     parser.add_argument("-e", "--export-charts", action="store_true", help="Output also charts in png")
     parser.add_argument("-o", "--output-dir", action="store", help="Output directory")
     parser.add_argument("-d", "--debug", action="store_true", help="Turn DEBUG output ON")
