@@ -1,11 +1,14 @@
 from setuptools import setup
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 setup(
     name="graphcat.py",
     version="1.0.0",
     author="wodensec",
     description="Generate graphs and charts on password cracking",
-    long_description="README.md",
+    long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/WodenSec/graphcat-ng",
     license="MIT",

@@ -44,6 +44,7 @@ options:
                         File containing hashes (one per line)
   -f FORMAT, --format FORMAT
                         hashfile format (default 3): 1 for hash; 2 for username:hash; 3 for secretsdump (username:uid:lm:ntlm)
+  --french              Generate report in French
   -e, --export-charts   Output also charts in png
   -o OUTPUT_DIR, --output-dir OUTPUT_DIR
                         Output directory
