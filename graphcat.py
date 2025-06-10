@@ -46,7 +46,7 @@ TRANSLATIONS = {
     },
     'fr': {
         'lang_code': 'fr',
-        'page_title': 'Rapport de craquage de mots de passe',
+        'page_title': 'Rapport d’audit de mots de passe',
         'title': 'Rapport de craquage de mots de passe',
         'total_hashes': 'Nombre total de hachages soumis :',
         'passwords_found': 'Mots de passe trouvés :',
