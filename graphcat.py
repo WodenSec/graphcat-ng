@@ -12,214 +12,21 @@ from typing import Dict, List
 import tempfile
 import shutil
 import difflib
-
+import json
 from jinja2 import Environment, FileSystemLoader
 import matplotlib.pyplot as plt
 
-TRANSLATIONS = {
-    'en': {
-        'lang_code': 'en',
-        'page_title': 'Password Cracking Report',
-        'title': 'Password Cracking Report',
-        'total_hashes': 'Total hashes submitted:',
-        'passwords_found': 'Passwords found:',
-        'passwords_not_found': 'Passwords not found:',
-        'percent_recovered': 'Percent of recovered passwords:',
-        'section_format': 'Password Format repartition',
-        'section_length': 'Password Length repartition',
-        'section_most': 'Top 10 Most used passwords',
-        'section_baseword': 'Top 10 Most used basewords',
-        'section_mask': 'Top 10 Most used masks',
-        'legend': 'Legend: d = digit, l = lowercase, U = uppercase, $ = special',
-        'section_history': 'Users with similar password pattern along history',
-        'footer_prefix': 'Report generated with',
-        'format_header': 'Format',
-        'count_header': 'Count',
-        'length_header': 'Length',
-        'password_header': 'Password',
-        'mask_header': 'Masks',
-        'percent_header': 'Percent',
-        'xlabel_length': 'Length',
-        'ylabel_count': 'Count',
-        'history_with': 'Users with similar password \npattern along history',
-        'history_without': 'Users without similar password \npattern along history',
-    },
-    'fr': {
-        'lang_code': 'fr',
-        'page_title': 'Rapport d’audit de mots de passe',
-        'title': 'Rapport de craquage de mots de passe',
-        'total_hashes': 'Nombre total de hachages soumis :',
-        'passwords_found': 'Mots de passe trouvés :',
-        'passwords_not_found': 'Mots de passe non trouvés :',
-        'percent_recovered': 'Pourcentage de mots de passe récupérés :',
-        'section_format': 'Répartition du format des mots de passe',
-        'section_length': 'Répartition de la longueur des mots de passe',
-        'section_most': 'Top 10 des mots de passe les plus utilisés',
-        'section_baseword': 'Top 10 des mots racines les plus utilisés',
-        'section_mask': 'Top 10 des masques les plus utilisés',
-        'legend': 'Légende : d = chiffre, l = minuscule, U = majuscule, $ = spécial',
-        'section_history': 'Utilisateurs avec un mot de passe similaire dans l’historique',
-        'footer_prefix': 'Rapport généré avec',
-        'format_header': 'Format',
-        'count_header': 'Nombre',
-        'length_header': 'Longueur',
-        'password_header': 'Mot de passe',
-        'mask_header': 'Masques',
-        'percent_header': 'Pourcentage',
-        'xlabel_length': 'Longueur',
-        'ylabel_count': 'Nombre',
-        'history_with': 'Utilisateurs ayant un mot de passe \nsimilaire dans l’historique',
-        'history_without': 'Utilisateurs sans mot de passe \nsimilaire dans l’historique',
-    },
-}
+RESOURCES_DIR = os.path.join(os.path.dirname(__file__), "resources")
 
-TEMPLATE = '''<!DOCTYPE html>
-<html lang="{{lang_code}}">
-    <head>
-        <meta charset="UTF-8">
-        <title>{{page_title_text}}</title>
-        <style>
-            body { font-family: Arial, sans-serif; margin: 20px; background-color: #f7f7f7; color: #333; }
-            table { border-collapse: collapse; margin-bottom: 20px; width: 100%; background-color: #fff; }
-            th, td { border: 1px solid #ccc; padding: 8px 12px; }
-            th { background-color: #e9e9e9; }
-            tr:nth-child(even) { background-color: #f2f2f2; }
-            h1 { text-align: center; }
-            img { max-width: 100%; height: auto; }
-            .chart { width: 800px; display: block; margin: 0 auto; }
-        </style>
-    </head>
-    <body>
-            <h1>{{title_text}}</h1>
-            <br>
-            <p>{{total_hashes}} <b>{{total_user}}</b></p>
-            <p>{{passwords_found}} <b>{{cracked}}</b></p>
-            <p>{{passwords_not_found}} <b>{{not_cracked}}</b></p>
-            <p>{{percent_recovered}} <b>{{cracked_pct}}%</b></p>
-            <br>
-            <img src='{{img_found}}' class="chart">
-            <br>
-            <h3 id="format">{{section_format}}</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">{{format_header}}</th>
-                        <th scope="col">{{count_header}}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for format,count in format.items() %}
-                    <tr>
-                        <td>{{format}}</td>
-                        <td>{{count}}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <br>
-            <img src='{{img_format}}' class="chart">
-            <br>
-            <h3 id="length">{{section_length}}</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">{{length_header}}</th>
-                        <th scope="col">{{count_header}}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for top,count in length.items() %}
-                    <tr>
-                        <td>{{top}}</td>
-                        <td>{{count}}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <br>
-            <div class="crop-container">
-                <img src='{{img_length}}' class="chart">
-            </div>
-            <br>
-            <h3 id="most">{{section_most}}</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">{{password_header}}</th>
-                        <th scope="col">{{count_header}}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for top,count in most.items() %}
-                    <tr>
-                        <td>{{top}}</td>
-                        <td>{{count}}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <br>
-            <div class="crop-container">
-                <img src='{{img_most}}' class="chart">
-            </div>
-            <br>
-            <br>
-            <h3 id="baseword">{{section_baseword}}</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">{{password_header}}</th>
-                        <th scope="col">{{count_header}}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for top,count in baseword.items() %}
-                    <tr>
-                        <td>{{top}}</td>
-                        <td>{{count}}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <br>
-            <div class="crop-container">
-                <img src='{{img_baseword}}' class="chart">
-            </div>
-            <br>
-            <h3 id="mask">{{section_mask}}</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">{{mask_header}}</th>
-                        <th scope="col">{{count_header}}</th>
-                        <th scope="col">{{percent_header}}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for top,count in masks.items() %}
-                    <tr>
-                        <td>{{top}}</td>
-                        <td>{{count}}</td>
-                        <td>{{ '%.2f'| format(count/cracked*100) }}%</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <br>
-            <p>{{legend}}</p>
-            <br>
-            {% if img_history != '' %}
-                <h3 id="history">{{section_history}}</h3>
-                <br>
-                <div class="crop-container">
-                <img src='{{img_history}}' class="chart">
-                </div>
-                <br>
-            {% endif %}
-            <span id=footer>{{footer_prefix}} <a href="https://github.com/wodensec/graphcat-ng">https://github.com/wodensec/graphcat-ng</a>, a tool originally by <a href="https://github.com/Orange-Cyberdefense/graphcat">Orange Cyberdefense</a>.</span>
-    </body>
-</html>
-'''
+
+def load_translations() -> Dict[str, Dict[str, str]]:
+    with open(os.path.join(RESOURCES_DIR, "translations.json"), encoding="utf-8") as f:
+        return json.load(f)
+
+
+TRANSLATIONS = load_translations()
+
+TEMPLATE_FILE = os.path.join(RESOURCES_DIR, "template.html")
 
 class Secret:
     def __init__(self, nthash: str, cleartext: str = None):
@@ -533,8 +340,7 @@ class GraphCat:
         # Generate pdf report based on htlm template
         print('[-] Generating report...')
 
-        with open(os.path.join(dirpath, 'template.html'), 'w') as template:
-            template.write(TEMPLATE)
+        shutil.copy(TEMPLATE_FILE, os.path.join(dirpath, 'template.html'))
 
         env = Environment(loader=FileSystemLoader(dirpath))
 
