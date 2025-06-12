@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="{{lang_code}}">
+    <head>
+        <meta charset="UTF-8">
+        <title>{{page_title_text}}</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; background-color: #f7f7f7; color: #333; }
+            table { border-collapse: collapse; margin-bottom: 20px; width: 100%; background-color: #fff; }
+            th, td { border: 1px solid #ccc; padding: 8px 12px; }
+            th { background-color: #e9e9e9; }
+            tr:nth-child(even) { background-color: #f2f2f2; }
+            h1 { text-align: center; }
+            img { max-width: 100%; height: auto; }
+            .chart { width: 800px; display: block; margin: 0 auto; }
+        </style>
+    </head>
+    <body>
+            <h1>{{title_text}}</h1>
+            <br>
+            <p>{{total_hashes}} <b>{{total_user}}</b></p>
+            <p>{{passwords_found}} <b>{{cracked}}</b></p>
+            <p>{{passwords_not_found}} <b>{{not_cracked}}</b></p>
+            <p>{{percent_recovered}} <b>{{cracked_pct}}%</b></p>
+            <br>
+            <img src='{{img_found}}' class="chart">
+            <br>
+            <h3 id="format">{{section_format}}</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{{format_header}}</th>
+                        <th scope="col">{{count_header}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for format,count in format.items() %}
+                    <tr>
+                        <td>{{format}}</td>
+                        <td>{{count}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <img src='{{img_format}}' class="chart">
+            <br>
+            <h3 id="length">{{section_length}}</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{{length_header}}</th>
+                        <th scope="col">{{count_header}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for top,count in length.items() %}
+                    <tr>
+                        <td>{{top}}</td>
+                        <td>{{count}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <div class="crop-container">
+                <img src='{{img_length}}' class="chart">
+            </div>
+            <br>
+            <h3 id="most">{{section_most}}</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{{password_header}}</th>
+                        <th scope="col">{{count_header}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for top,count in most.items() %}
+                    <tr>
+                        <td>{{top}}</td>
+                        <td>{{count}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <div class="crop-container">
+                <img src='{{img_most}}' class="chart">
+            </div>
+            <br>
+            <br>
+            <h3 id="baseword">{{section_baseword}}</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{{password_header}}</th>
+                        <th scope="col">{{count_header}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for top,count in baseword.items() %}
+                    <tr>
+                        <td>{{top}}</td>
+                        <td>{{count}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <div class="crop-container">
+                <img src='{{img_baseword}}' class="chart">
+            </div>
+            <br>
+            <h3 id="mask">{{section_mask}}</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{{mask_header}}</th>
+                        <th scope="col">{{count_header}}</th>
+                        <th scope="col">{{percent_header}}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for top,count in masks.items() %}
+                    <tr>
+                        <td>{{top}}</td>
+                        <td>{{count}}</td>
+                        <td>{{ '%.2f'| format(count/cracked*100) }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <p>{{legend}}</p>
+            <br>
+            {% if img_history != '' %}
+                <h3 id="history">{{section_history}}</h3>
+                <br>
+                <div class="crop-container">
+                <img src='{{img_history}}' class="chart">
+                </div>
+                <br>
+            {% endif %}
+            <span id=footer>{{footer_prefix}} <a href="https://github.com/wodensec/graphcat-ng">https://github.com/wodensec/graphcat-ng</a>, a tool originally by <a href="https://github.com/Orange-Cyberdefense/graphcat">Orange Cyberdefense</a>.</span>
+    </body>
+</html>
