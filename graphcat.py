@@ -2,7 +2,6 @@
 
 import argparse
 from collections import Counter
-import calendar
 import time
 import os
 import re
@@ -63,7 +62,7 @@ class GraphCat:
         self.options = options
         self.trans = TRANSLATIONS['fr'] if self.options.french else TRANSLATIONS['en']
 
-        self.timestamp = calendar.timegm(time.gmtime())
+        self.timestamp = time.strftime("%Y-%m-%d_%H-%M-%S", time.gmtime())
         self.potfile = None
         self.hashes = None
         self.outputdir = '.'
@@ -158,9 +157,6 @@ class GraphCat:
         fig.gca().add_artist(centre_circle)
 
         plt.savefig(os.path.join(dirpath,'cracked.png'), dpi=118)
-        if self.options.export_charts:
-            print('[-] Cracked charts available at cracked.png')
-            plt.savefig(os.path.join(self.outputdir,'cracked.png'), dpi=118)
 
         # Pie N°2 : Format
 
@@ -204,9 +200,6 @@ class GraphCat:
         fig.gca().add_artist(centre_circle)
 
         plt.savefig(os.path.join(dirpath,'format.png'), dpi=118)
-        if self.options.export_charts:
-            print('[-] Password format repartition available at format.png')
-            plt.savefig(os.path.join(self.outputdir,'format.png'), dpi=118)
 
         # Pie N°3 : Length repartition
 
@@ -240,9 +233,6 @@ class GraphCat:
         for i in range(len(x)):
             plt.text(i, y[i]+(longueur_max/100*1.5), y[i], ha = 'center')
         plt.savefig(os.path.join(dirpath,'length.png'), dpi=118)
-        if self.options.export_charts:
-            print('[-] Password length repartition available at length.png')
-            plt.savefig(os.path.join(self.outputdir,'length.png'), dpi=118)
 
         # Pie N°4 and N°5 : Top 10 most cracked and Top 10 basewords
 
@@ -275,9 +265,6 @@ class GraphCat:
         for i in range(len(x)):
             plt.text(i, y[i]+(most_max/100*1.5), y[i], ha = 'center')
         plt.savefig(os.path.join(dirpath,'most.png'), dpi=118)
-        if self.options.export_charts:
-            print('[-] Top10 most cracked password at most.png')
-            plt.savefig(os.path.join(self.outputdir,'most.png'), dpi=118)
 
         basewords = dict()
         for key, value in c2.most_common(10):
@@ -297,9 +284,6 @@ class GraphCat:
         for i in range(len(x)):
             plt.text(i, y[i]+(baseword_max/100*1.5), y[i], ha = 'center')
         plt.savefig(os.path.join(dirpath,'basewords.png'), dpi=118)
-        if self.options.export_charts:
-            print('[-] Top10 basewords at basewords.png')
-            plt.savefig(os.path.join(self.outputdir,'basewords.png'), dpi=118)
 
         common_masks = dict()
         for key, value in c3.most_common(10):
@@ -333,9 +317,6 @@ class GraphCat:
             fig.gca().add_artist(centre_circle)
 
             plt.savefig(os.path.join(dirpath,'history.png'), dpi=118)
-            if self.options.export_charts:
-                print('[-] History analysis at history.png')
-                plt.savefig(os.path.join(self.outputdir,'history.png'), dpi=118)
             
         # Generate pdf report based on htlm template
         print('[-] Generating report...')
@@ -386,7 +367,8 @@ class GraphCat:
                             )
 
         with open(os.path.join(dirpath,'report.html'), 'w') as f:
-            f.write(html)  
+            f.write(html)
+        os.remove(os.path.join(dirpath, 'template.html'))
 
     def isNaN(self,num):
         return num!= num
@@ -526,7 +508,6 @@ if __name__ == '__main__':
         ),
     )
     parser.add_argument("--french", action="store_true", help="Generate report in French")
-    parser.add_argument("-e", "--export-charts", action="store_true", help="Output also charts in png")
     parser.add_argument("-o", "--output-dir", action="store", help="Output directory")
     parser.add_argument("-d", "--debug", action="store_true", help="Turn DEBUG output ON")
 
