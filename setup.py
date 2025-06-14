@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="graphcat.py",
+    name="graphcat",
     version="1.0.0",
     author="wodensec",
     description="Generate graphs and charts on password cracking",
@@ -18,5 +18,12 @@ setup(
         "numpy<2"
     ],
     python_requires='>=3.6',
-    scripts=["graphcat.py"]
+    py_modules=["graphcat"],
+    entry_points={
+        "console_scripts": [
+            "graphcat=graphcat:main"
+        ]
+    },
+    include_package_data=True,
 )
+
