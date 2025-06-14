@@ -14,7 +14,7 @@ Generate graphs and charts from Hashcat potfiles and NTDS dumps.
 - [Formats](#formats)
 - [Charts Example](#charts-example)
 
-## Installation 🚀
+## Installation
 
 ### Prerequisite
 ```text
