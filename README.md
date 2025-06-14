@@ -102,6 +102,9 @@ Moreover, if you submit secretsdump with password history (`-history` in secrets
 
 <img title="Cracked" src="./assets/cracked.png">
 <img title="Format repartition" src="./assets/format.png">
+
+**Graphcat-ng now supports French** for the report (including graphs !). Add the `--french` flag to your command.
+
 <img title="Length repartition" src="./assets/length.png">
 <img title="Top10 most cracked" src="./assets/most.png">
 <img title="Top10 basewords" src="./assets/basewords.png">
