@@ -2,8 +2,8 @@
 
 Generate graphs and charts from Hashcat potfiles and NTDS dumps.
 
-* PDF report with password cracking statistics
-* 📊 Automatic PNG charts stored alongside the report
+* HTML report with password cracking statistics
+* Automatic PNG charts stored alongside the report
 * English and French support
 
 ## Table of Contents
