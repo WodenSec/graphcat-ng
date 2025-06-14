@@ -6,6 +6,13 @@ Generate graphs and charts from Hashcat potfiles and NTDS dumps.
 * Automatic PNG charts stored alongside the report
 * English and French support
 
+Originally made by [zblurx](https://github.com/zblurx) for [Orange Cyberdefense](https://github.com/Orange-Cyberdefense)
+
+Main changes from the original version :
+* Changed PDF report to HTML report for easier customization
+* Added French support for report and graphs
+* Removed `john` format
+
 ## Table of Contents
 
 - [Installation](#installation-)
