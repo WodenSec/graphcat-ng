@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="graphcat",
     version="1.0.0",
-    author="wodensec",
+    author="zblurx, nevasec",
     description="Generate graphs and charts on password cracking",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -26,4 +26,3 @@ setup(
     },
     include_package_data=True,
 )
-
