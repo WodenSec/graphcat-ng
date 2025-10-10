@@ -28,8 +28,8 @@
   },
   "fr": {
     "lang_code": "fr",
-    "page_title": "Rapport d’audit de mots de passe",
-    "title": "Rapport de craquage de mots de passe",
+    "page_title": "Rapport d'audit de mots de passe",
+    "title": "Rapport d'audit de mots de passe",
     "total_hashes": "Nombre total de hachages soumis :",
     "passwords_found": "Mots de passe trouvés :",
     "passwords_not_found": "Mots de passe non trouvés :",
@@ -40,7 +40,7 @@
     "section_baseword": "Top 10 des mots racines les plus utilisés",
     "section_mask": "Top 10 des masques les plus utilisés",
     "legend": "Légende : d = chiffre, l = minuscule, U = majuscule, $ = spécial",
-    "section_history": "Utilisateurs avec un mot de passe similaire dans l’historique",
+    "section_history": "Utilisateurs avec un mot de passe similaire dans l'historique",
     "footer_prefix": "Rapport généré avec",
     "format_header": "Format",
     "count_header": "Nombre",
@@ -50,7 +50,7 @@
     "percent_header": "Pourcentage",
     "xlabel_length": "Longueur",
     "ylabel_count": "Nombre",
-    "history_with": "Utilisateurs ayant un mot de passe \nsimilaire dans l’historique",
-    "history_without": "Utilisateurs sans mot de passe \nsimilaire dans l’historique"
+    "history_with": "Utilisateurs ayant un mot de passe \nsimilaire dans l'historique",
+    "history_without": "Utilisateurs sans mot de passe \nsimilaire dans l'historique"
   }
 }
