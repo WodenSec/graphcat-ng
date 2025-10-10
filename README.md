@@ -30,7 +30,7 @@ apt install python3-venv
 
 ### Steps
 ```text
-git clone https://github.com/WodenSec/graphcat-ng
+git clone https://github.com/NevaSec/graphcat-ng
 cd graphcat-ng
 python3 -m venv .venv
 source .venv/bin/activate
